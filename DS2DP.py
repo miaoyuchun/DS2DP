@@ -230,3 +230,22 @@ def dehaze(path, filename, result, image_name, image, image_clean, num_iter=1000
     dh = Dehaze(path, filename, image_name + "_0", image, image_clean, num_iter, plot_during_training, show_every, use_deep_channel_prior,
                 gt_ambient, clip=True)
     dh.optimize()
+
+
+if __name__ == "__main__":
+    result = []
+    dataname = {
+        0: "wdc_h",
+        1: "pavia",
+        2: "paviac",
+    }
+    for case in range(5, 6):
+        for num in range(0, 1):
+            print("case %d num %d" % (case, num))
+            path = "images//Case{}".format(case)
+            filename = dataname.get(num)
+            mat = scipy.io.loadmat(os.path.join(path, filename + ".mat"))
+            image_clean = mat["img_clean"]
+            image_noisy = mat["img_noisy"]
+            image_noisy = np.reshape(image_noisy, (image_noisy.shape[0] * image_noisy.shape[1], image_noisy.shape[2]), order="F")
+            result = dehaze(path, filename, result, "hs_noisy", image_noisy, image_clean, use_deep_channel_prior=True, gt_ambient=np.array([0.5600084 , 0.64564645, 0.72515032]))
